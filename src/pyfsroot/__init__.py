@@ -2,7 +2,7 @@ import ROOT
 import os
 import glob
 
-__all__ = [ "ROOT", "utils" ]
+__all__ = [ "ROOT", "graphics" ]
 
 FSROOT_DIR = os.path.expandvars("${FSROOT}")
 
