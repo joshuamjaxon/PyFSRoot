@@ -1,5 +1,45 @@
 import ROOT
 
+# Define the Petroff color palettes from arXiv:2107.02270v2
+# These are defined in later versions of ROOT, but if your 
+# institution uses an older version of ROOT, it is useful to
+# have access to them here.
+
+PPP6 = [
+    ROOT.TColor.GetColor("#5790fc"),
+    ROOT.TColor.GetColor("#f89c20"),
+    ROOT.TColor.GetColor("#e42536"),
+    ROOT.TColor.GetColor("#964a8b"),
+    ROOT.TColor.GetColor("#9c9ca1"),
+    ROOT.TColor.GetColor("#7a21dd")
+]
+PPP8 = [
+    ROOT.TColor.GetColor("#1845fb"),
+    ROOT.TColor.GetColor("#ff5e02"),
+    ROOT.TColor.GetColor("#c91f16"),
+    ROOT.TColor.GetColor("#c849a9"),
+    ROOT.TColor.GetColor("#adad7d"),
+    ROOT.TColor.GetColor("#86c8dd"),
+    ROOT.TColor.GetColor("#578dff"),
+    ROOT.TColor.GetColor("#656364")
+]
+PPP10 = [
+    ROOT.TColor.GetColor("#3f90da"),
+    ROOT.TColor.GetColor("#ffa90e"),
+    ROOT.TColor.GetColor("#bd1f01"),
+    ROOT.TColor.GetColor("#94a4a2"),
+    ROOT.TColor.GetColor("#832db6"),
+    ROOT.TColor.GetColor("#a96b59"),
+    ROOT.TColor.GetColor("#e76300"),
+    ROOT.TColor.GetColor("#b9ac70"),
+    ROOT.TColor.GetColor("#717581"),
+    ROOT.TColor.GetColor("#92dadd")
+]
+
+
+# Define some functions for drawing vertical and horizontal lines,
+# as well as boxes bounded by vertical and horizontal lines.
+
 def get_vertical_line(x, style = 2, width = 3, color = ROOT.TColor.GetColor("#e42536"), relative_margin = 0.01):
     ROOT.gPad.Update()
     ul = ROOT.gPad.GetUymax()
