@@ -105,8 +105,8 @@ def draw_horizontal_box(y1, y2, color = ROOT.TColor.GetColor("#e42536"), alpha =
 def redraw_border():
    # Adapted for Python from C++ written by couet:
    # https://root-forum.cern.ch/t/how-to-redraw-axis-and-plot-borders/28252
-   ROOT.gPad.Update();
-   ROOT.gPad.RedrawAxis();
+   ROOT.gPad.Update()
+   ROOT.gPad.RedrawAxis()
    l = ROOT.TLine()
-   l.DrawLine(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax());
-   l.DrawLine(ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax());
+   l.DrawLine(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax())
+   l.DrawLine(ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax())
