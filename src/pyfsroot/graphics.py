@@ -110,3 +110,69 @@ def redraw_border():
    l = ROOT.TLine()
    l.DrawLine(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax())
    l.DrawLine(ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax())
+
+
+def get_pad_xmin():
+    return ROOT.gPad.GetUxmin()
+
+def get_pad_xmax():
+    return ROOT.gPad.GetUxmax()
+
+def get_pad_ymin():
+    return ROOT.gPad.GetUymin()
+
+def get_pad_ymax():
+    return ROOT.gPad.GetUymax()
+
+def get_pad_xrange():
+    return (ROOT.gPad.GetUxmax() - ROOT.gPad.GetUxmin())
+
+def get_pad_yrange():
+    return (ROOT.gPad.GetUymax() - ROOT.gPad.GetUymin())
+
+def get_pad_xyratio():
+    return (ROOT.gPad.GetUxmax() - ROOT.gPad.GetUxmin()) / (ROOT.gPad.GetUymax() - ROOT.gPad.GetUymin())
+
+def get_label_anchor_left(x = 0.03):
+    return x * get_pad_xrange() + get_pad_xmin()
+
+def get_label_anchor_right(x = 0.03):
+    return (1.0 - x) * get_pad_xrange() + get_pad_xmin()
+
+def get_label_anchor_top(y = 0.03):
+    return (1.0 - y) * get_pad_yrange() + get_pad_ymin()
+
+def get_label_anchor_bottom(y = 0.03):
+    return y * get_pad_yrange() + get_pad_ymin()
+
+def draw_label_top_left(label, size_pixels = 3, text_align = ROOT.kVAlignTop + ROOT.kHAlignLeft, color=ROOT.kBlack, margin_NDC = 0.03):
+    ltx = ROOT.TLatex()
+    ltx.SetTextSizePixels(size_pixels)
+    ltx.SetTextAlign(text_align)
+    ltx.SetTextColor(color)
+    ltx.DrawLatex(get_label_anchor_left(margin_NDC), get_label_anchor_top(margin_NDC), label)
+    return ltx
+
+def draw_label_top_right(label, size_pixels = 3, text_align = ROOT.kVAlignTop + ROOT.kHAlignRight, color=ROOT.kBlack, margin_NDC = 0.03):
+    ltx = ROOT.TLatex()
+    ltx.SetTextSizePixels(size_pixels)
+    ltx.SetTextAlign(text_align)
+    ltx.SetTextColor(color)
+    ltx.DrawLatex(get_label_anchor_right(margin_NDC), get_label_anchor_top(margin_NDC), label)
+    return ltx
+
+def draw_label_bottom_left(label, size_pixels = 3, text_align = ROOT.kVAlignBottom + ROOT.kHAlignLeft, color=ROOT.kBlack, margin_NDC = 0.03):
+    ltx = ROOT.TLatex()
+    ltx.SetTextSizePixels(size_pixels)
+    ltx.SetTextAlign(text_align)
+    ltx.SetTextColor(color)
+    ltx.DrawLatex(get_label_anchor_left(margin_NDC), get_label_anchor_bottom(margin_NDC), label)
+    return ltx
+
+def draw_label_bottom_right(label, size_pixels = 3, text_align = ROOT.kVAlignBottom + ROOT.kHAlignRight, color=ROOT.kBlack, margin_NDC = 0.03):
+    ltx = ROOT.TLatex()
+    ltx.SetTextSizePixels(size_pixels)
+    ltx.SetTextAlign(text_align)
+    ltx.SetTextColor(color)
+    ltx.DrawLatex(get_label_anchor_right(margin_NDC), get_label_anchor_bottom(margin_NDC), label)
+    return ltx
