@@ -244,11 +244,6 @@ def make_multi_pad_canvas(
             )
             current_pad_width = current_left_margin + current_right_margin + plot_width
 
-            print(current_top_margin )
-            print(current_bottom_margin )
-            print(current_left_margin )
-            print(current_right_margin )
-
             current_pad_height_ndc = current_pad_height / canvas_height
             current_pad_width_ndc = current_pad_width / canvas_width
 
