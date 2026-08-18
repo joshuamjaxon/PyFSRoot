@@ -176,3 +176,120 @@ def draw_label_bottom_right(label, size_pixels = 3, text_align = ROOT.kVAlignBot
     ltx.SetTextColor(color)
     ltx.DrawLatex(get_label_anchor_right(margin_NDC), get_label_anchor_bottom(margin_NDC), label)
     return ltx
+
+
+def make_multi_pad_canvas(
+    rows=1,
+    columns=1,
+    normal_height=None,
+    normal_width=None,
+    info_height=100,
+    name="",
+    title="Canvas",
+):
+    """
+    Make a grid of identical canvases with room on the bottom for an info
+    panel, such as a legend or other notes. This is a non-trivial problem
+    because ideally you want all the plots--not pads--to be the same size,
+    accounting for margins.
+    """
+
+    f_normal_height = (
+        int(ROOT.gStyle.GetCanvasDefH()) if normal_height is None else normal_height
+    )
+    f_normal_width = (
+        int(ROOT.gStyle.GetCanvasDefW()) if normal_width is None else normal_width
+    )
+    f_info_height = int(info_height)
+
+    pad_top_margin = int(ROOT.gStyle.GetPadTopMargin() * f_normal_height)
+    pad_bottom_margin = int(ROOT.gStyle.GetPadBottomMargin() * f_normal_height)
+    pad_left_margin = int(ROOT.gStyle.GetPadLeftMargin() * f_normal_width)
+    pad_right_margin = int(ROOT.gStyle.GetPadRightMargin() * f_normal_width)
+
+    plot_height = f_normal_height - pad_top_margin - pad_bottom_margin
+    plot_width = f_normal_width - pad_left_margin - pad_right_margin
+
+    canvas_height = (
+        pad_top_margin + pad_bottom_margin + (rows * plot_height) + info_height
+    )
+    canvas_width = pad_left_margin + pad_right_margin + (columns * plot_width)
+
+    canvas = ROOT.TCanvas(name, title, canvas_width, canvas_height)
+
+    grid_pads = []
+
+    info_pad_bottom_left_x = 0
+    info_pad_bottom_left_y = 0
+    info_pad_top_right_x = 1.0
+    info_pad_top_right_y = info_height / canvas_height
+
+    current_top_left_x = 0
+    current_top_left_y = 1.0
+
+    for ri in range(rows):
+
+        for ci in range(columns):
+
+            pad_number = ri * columns + ci + 1
+            pad_name = f"canvas_{name}_pad_{pad_number}"
+
+            current_top_margin = int(ri == 0) * pad_top_margin
+            current_bottom_margin = int(ri == rows - 1) * pad_bottom_margin
+            current_left_margin = int(ci == 0) * pad_left_margin
+            current_right_margin = int(ci == columns - 1) * pad_right_margin
+
+            current_pad_height = (
+                current_top_margin + current_bottom_margin + plot_height
+            )
+            current_pad_width = current_left_margin + current_right_margin + plot_width
+
+            print(current_top_margin )
+            print(current_bottom_margin )
+            print(current_left_margin )
+            print(current_right_margin )
+
+            current_pad_height_ndc = current_pad_height / canvas_height
+            current_pad_width_ndc = current_pad_width / canvas_width
+
+            ipad = ROOT.TPad(
+                pad_name,
+                pad_name,
+                current_top_left_x,
+                current_top_left_y - current_pad_height_ndc,
+                current_top_left_x + current_pad_width_ndc,
+                current_top_left_y,
+            )
+
+            ipad.SetNumber(pad_number)
+
+            ipad.SetTopMargin(current_top_margin / current_pad_height)
+            ipad.SetBottomMargin(current_bottom_margin / current_pad_height)
+            ipad.SetLeftMargin(current_left_margin / current_pad_width)
+            ipad.SetRightMargin(current_right_margin / current_pad_width)
+
+            ipad.Draw()
+
+            grid_pads.append(ipad)
+
+            current_top_left_x += current_pad_width_ndc
+
+        current_top_left_x = 0.0
+        current_top_left_y -= current_pad_height_ndc
+
+    info_pad_name = f"canvas_{name}_info_pad"
+    info_pad = ROOT.TPad(
+        info_pad_name,
+        info_pad_name,
+        info_pad_bottom_left_x,
+        info_pad_bottom_left_y,
+        info_pad_top_right_x,
+        info_pad_top_right_y,
+    )
+    info_pad.SetNumber(rows * columns + 1)
+    info_pad.Draw()
+
+    canvas._grid_pads = grid_pads
+    canvas._info_pad = info_pad
+
+    return canvas
