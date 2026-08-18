@@ -780,19 +780,20 @@ def make_multi_pad_canvas(
         current_top_left_x = 0.0
         current_top_left_y -= current_pad_height_ndc
 
-    info_pad_name = f"canvas_{name}_info_pad"
-    info_pad = ROOT.TPad(
-        info_pad_name,
-        info_pad_name,
-        info_pad_bottom_left_x,
-        info_pad_bottom_left_y,
-        info_pad_top_right_x,
-        info_pad_top_right_y,
-    )
-    info_pad.SetNumber(rows * columns + 1)
-    info_pad.Draw()
-
     canvas._grid_pads = grid_pads
-    canvas._info_pad = info_pad
 
+    if info_height:
+        info_pad_name = f"canvas_{name}_info_pad"
+        info_pad = ROOT.TPad(
+            info_pad_name,
+            info_pad_name,
+            info_pad_bottom_left_x,
+            info_pad_bottom_left_y,
+            info_pad_top_right_x,
+            info_pad_top_right_y,
+        )
+        info_pad.SetNumber(rows * columns + 1)
+        info_pad.Draw()
+        canvas._info_pad = info_pad
+    
     return canvas
