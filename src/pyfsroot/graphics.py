@@ -1,7 +1,9 @@
 import ROOT
 
+from typing import Literal, Union
+
 # Define the Petroff color palettes from arXiv:2107.02270v2
-# These are defined in later versions of ROOT, but if your 
+# These are defined in later versions of ROOT, but if your
 # institution uses an older version of ROOT, it is useful to
 # have access to them here.
 
@@ -11,7 +13,7 @@ PPP6 = [
     ROOT.TColor.GetColor("#e42536"),
     ROOT.TColor.GetColor("#964a8b"),
     ROOT.TColor.GetColor("#9c9ca1"),
-    ROOT.TColor.GetColor("#7a21dd")
+    ROOT.TColor.GetColor("#7a21dd"),
 ]
 PPP8 = [
     ROOT.TColor.GetColor("#1845fb"),
@@ -21,7 +23,7 @@ PPP8 = [
     ROOT.TColor.GetColor("#adad7d"),
     ROOT.TColor.GetColor("#86c8dd"),
     ROOT.TColor.GetColor("#578dff"),
-    ROOT.TColor.GetColor("#656364")
+    ROOT.TColor.GetColor("#656364"),
 ]
 PPP10 = [
     ROOT.TColor.GetColor("#3f90da"),
@@ -33,148 +35,568 @@ PPP10 = [
     ROOT.TColor.GetColor("#e76300"),
     ROOT.TColor.GetColor("#b9ac70"),
     ROOT.TColor.GetColor("#717581"),
-    ROOT.TColor.GetColor("#92dadd")
+    ROOT.TColor.GetColor("#92dadd"),
 ]
 
 
 # Define some functions for drawing vertical and horizontal lines,
 # as well as boxes bounded by vertical and horizontal lines.
 
-def get_vertical_line(x, style = 2, width = 3, color = ROOT.TColor.GetColor("#e42536"), relative_margin = 0.01):
+
+def get_vertical_line(
+    x: float,
+    style: int = 2,
+    width: int = 3,
+    color: int = ROOT.TColor.GetColor("#e42536"),
+    relative_margin: float = 0.01,
+) -> ROOT.TLine:
+    """
+    Create a vertical ROOT.TLine object at position x.
+
+    :param x: The horizontal position of the vertical line in user coordinates.
+    :type x: float
+
+    :param style: The ROOT.TAttLine line style.
+    :type style: int
+
+    :param width: The line width in pixels.
+    :type width: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param relative_margin: The fraction of the axis to use as the margin on either end of the line.
+    :type relative_margin: float
+
+    :returns: a ROOT.TLine object with the specified properties.
+    :rtype: ROOT.TLine
+    """
     ROOT.gPad.Update()
     ul = ROOT.gPad.GetUymax()
     ll = ROOT.gPad.GetUymin()
     margin = (ul - ll) * relative_margin
-    line = ROOT.TLine(x, ll+margin, x, ul-margin)
+    line = ROOT.TLine(x, ll + margin, x, ul - margin)
     line.SetLineStyle(style)
     line.SetLineWidth(width)
     line.SetLineColor(color)
     return line
 
-def get_horizontal_line(y, style = 2, width = 3, color = ROOT.TColor.GetColor("#e42536"), relative_margin = 0.01):
+
+def get_horizontal_line(
+    y: float,
+    style: int = 2,
+    width: int = 3,
+    color: int = ROOT.TColor.GetColor("#e42536"),
+    relative_margin: float = 0.01,
+) -> ROOT.TLine:
+    """
+    Create a horizontal ROOT.TLine object at position y.
+
+    :param x: The vertical position of the horizontal line in user coordinates.
+    :type x: float
+
+    :param style: The ROOT.TAttLine line style.
+    :type style: int
+
+    :param width: The line width in pixels.
+    :type width: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param relative_margin: The fraction of the axis to use as the margin on either end of the line.
+    :type relative_margin: float
+
+    :returns: a ROOT.TLine object with the specified properties.
+    :rtype: ROOT.TLine
+    """
     ROOT.gPad.Update()
     ul = ROOT.gPad.GetUxmax()
     ll = ROOT.gPad.GetUxmin()
     margin = (ul - ll) * relative_margin
-    line = ROOT.TLine(ll+margin, y, ul-margin, y)
+    line = ROOT.TLine(ll + margin, y, ul - margin, y)
     line.SetLineStyle(style)
     line.SetLineWidth(width)
     line.SetLineColor(color)
     return line
 
-def draw_vertical_line(x, style = 2, width = 3, color = ROOT.TColor.GetColor("#e42536"), relative_margin = 0.01):
+
+def draw_vertical_line(
+    x: float,
+    style: int = 2,
+    width: int = 3,
+    color: int = ROOT.TColor.GetColor("#e42536"),
+    relative_margin: float = 0.01,
+) -> ROOT.TLine:
+    """
+    Create a vertical ROOT.TLine object at position x and draw it on the current pad.
+
+    :param x: The horizontal position of the vertical line in user coordinates.
+    :type x: float
+
+    :param style: The ROOT.TAttLine line style.
+    :type style: int
+
+    :param width: The line width in pixels.
+    :type width: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param relative_margin: The fraction of the axis to use as the margin on either end of the line.
+    :type relative_margin: float
+
+    :returns: a ROOT.TLine object with the specified properties.
+    :rtype: ROOT.TLine
+    """
     line = get_vertical_line(x, style, width, color, relative_margin)
     line.Draw()
     return line
 
-def draw_horizontal_line(y, style = 2, width = 3, color = ROOT.TColor.GetColor("#e42536"), relative_margin = 0.01):
+
+def draw_horizontal_line(
+    y: float,
+    style: int = 2,
+    width: int = 3,
+    color: int = ROOT.TColor.GetColor("#e42536"),
+    relative_margin: float = 0.01,
+) -> ROOT.TLine:
+    """
+    Create a horizontal ROOT.TLine object at position y and draw it on the current pad.
+
+    :param x: The vertical position of the horizontal line in user coordinates.
+    :type x: float
+
+    :param style: The ROOT.TAttLine line style.
+    :type style: int
+
+    :param width: The line width in pixels.
+    :type width: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param relative_margin: The fraction of the axis to use as the margin on either end of the line.
+    :type relative_margin: float
+
+    :returns: a ROOT.TLine object with the specified properties.
+    :rtype: ROOT.TLine
+    """
     line = get_horizontal_line(y, style, width, color, relative_margin)
     line.Draw()
     return line
 
 
-def get_vertical_box(x1, x2, color = ROOT.TColor.GetColor("#e42536"), alpha = 0.1, relative_margin = 0.0):
+def get_vertical_box(
+    x1: float,
+    x2: float,
+    color: int = ROOT.TColor.GetColor("#e42536"),
+    alpha: float = 0.1,
+    relative_margin: float = 0.0,
+) -> ROOT.TBox:
+    """
+    Create a box bounded by vertical lines at positions x1 and x2.
+
+    :param x1: The horizontal position of the first vertical line in user coordinates.
+    :type x1: float
+
+    :param x2: The horizontal position of the second vertical line in user coordinates.
+    :type x2: float
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param alpha: The transparency level of the box. The box is fully transparent at 0 and fully opaque at 1.0.
+    :type alpha: int
+
+    :param relative_margin: The fraction of the axis to use as the margin on either end of each vertical line.
+    :type relative_margin: float
+
+    :returns: a ROOT.TBox object with the specified properties.
+    :rtype: ROOT.TBox
+    """
     ROOT.gPad.Update()
     ul = ROOT.gPad.GetUymax()
     ll = ROOT.gPad.GetUymin()
     margin = (ul - ll) * relative_margin
-    box = ROOT.TBox(x1, ll+margin, x2, ul-margin)
+    box = ROOT.TBox(x1, ll + margin, x2, ul - margin)
     box.SetFillColorAlpha(color, alpha)
     return box
 
-def get_horizontal_box(y1, y2, color = ROOT.TColor.GetColor("#e42536"), alpha = 0.1, relative_margin = 0.0):
+
+def get_horizontal_box(
+    y1: float,
+    y2: float,
+    color: int = ROOT.TColor.GetColor("#e42536"),
+    alpha: float = 0.1,
+    relative_margin: float = 0.0,
+) -> ROOT.TBox:
+    """
+    Create a box bounded by horizontal lines at positions y1 and y2.
+
+    :param y1: The vertical position of the first horizontal line in user coordinates.
+    :type y1: float
+
+    :param y2: The vertical position of the second horizontal line in user coordinates.
+    :type y2: float
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param alpha: The transparency level of the box. The box is fully transparent at 0 and fully opaque at 1.0.
+    :type alpha: int
+
+    :param relative_margin: The fraction of the axis to use as the margin on either end of each horizontal line.
+    :type relative_margin: float
+
+    :returns: a ROOT.TBox object with the specified properties.
+    :rtype: ROOT.TBox
+    """
     ROOT.gPad.Update()
     ul = ROOT.gPad.GetUxmax()
     ll = ROOT.gPad.GetUxmin()
     margin = (ul - ll) * relative_margin
-    box = ROOT.TBox(ll+margin, y1, ul-margin, y2)
+    box = ROOT.TBox(ll + margin, y1, ul - margin, y2)
     box.SetFillColorAlpha(color, alpha)
     return box
 
-def draw_vertical_box(x1, x2, color = ROOT.TColor.GetColor("#e42536"), alpha = 0.1, relative_margin = 0.0):
+
+def draw_vertical_box(
+    x1: float,
+    x2: float,
+    color: int = ROOT.TColor.GetColor("#e42536"),
+    alpha: float = 0.1,
+    relative_margin: float = 0.0,
+) -> ROOT.TBox:
+    """
+    Create a box bounded by vertical lines at positions x1 and x2 and draw it on the current pad.
+
+    :param x1: The horizontal position of the first vertical line in user coordinates.
+    :type x1: float
+
+    :param x2: The horizontal position of the second vertical line in user coordinates.
+    :type x2: float
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param alpha: The transparency level of the box. The box is fully transparent at 0 and fully opaque at 1.0.
+    :type alpha: int
+
+    :param relative_margin: The fraction of the axis to use as the margin on either end of each vertical line.
+    :type relative_margin: float
+
+    :returns: the drawn ROOT.TBox object with the specified properties.
+    :rtype: ROOT.TBox
+    """
     box = get_vertical_box(x1, x2, color, alpha, relative_margin)
     box.Draw()
     return box
 
-def draw_horizontal_box(y1, y2, color = ROOT.TColor.GetColor("#e42536"), alpha = 0.1, relative_margin = 0.0):
+
+def draw_horizontal_box(
+    y1: float,
+    y2: float,
+    color: int = ROOT.TColor.GetColor("#e42536"),
+    alpha: float = 0.1,
+    relative_margin: float = 0.0,
+) -> ROOT.TBox:
+    """
+    Create a box bounded by horizontal lines at positions y1 and y2 and draw it on the current pad.
+
+    :param y1: The vertical position of the first horizontal line in user coordinates.
+    :type y1: float
+
+    :param y2: The vertical position of the second horizontal line in user coordinates.
+    :type y2: float
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param alpha: The transparency level of the box. The box is fully transparent at 0 and fully opaque at 1.0.
+    :type alpha: int
+
+    :param relative_margin: The fraction of the axis to use as the margin on either end of each horizontal line.
+    :type relative_margin: float
+
+    :returns: the drawn ROOT.TBox object with the specified properties.
+    :rtype: ROOT.TBox
+    """
     box = get_horizontal_box(y1, y2, color, alpha, relative_margin)
     box.Draw()
     return box
 
 
 def redraw_border():
-   # Adapted for Python from C++ written by couet:
-   # https://root-forum.cern.ch/t/how-to-redraw-axis-and-plot-borders/28252
-   ROOT.gPad.Update()
-   ROOT.gPad.RedrawAxis()
-   l = ROOT.TLine()
-   l.DrawLine(ROOT.gPad.GetUxmin(), ROOT.gPad.GetUymax(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax())
-   l.DrawLine(ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymin(), ROOT.gPad.GetUxmax(), ROOT.gPad.GetUymax())
+    """
+    Redraw the border in the current pad.
+    """
+    # Adapted for Python from C++ written by couet:
+    # https://root-forum.cern.ch/t/how-to-redraw-axis-and-plot-borders/28252
+    ROOT.gPad.Update()
+    ROOT.gPad.RedrawAxis()
+    l = ROOT.TLine()
+    l.DrawLine(
+        ROOT.gPad.GetUxmin(),
+        ROOT.gPad.GetUymax(),
+        ROOT.gPad.GetUxmax(),
+        ROOT.gPad.GetUymax(),
+    )
+    l.DrawLine(
+        ROOT.gPad.GetUxmax(),
+        ROOT.gPad.GetUymin(),
+        ROOT.gPad.GetUxmax(),
+        ROOT.gPad.GetUymax(),
+    )
 
 
 def get_pad_xmin():
     return ROOT.gPad.GetUxmin()
 
+
 def get_pad_xmax():
     return ROOT.gPad.GetUxmax()
+
 
 def get_pad_ymin():
     return ROOT.gPad.GetUymin()
 
+
 def get_pad_ymax():
     return ROOT.gPad.GetUymax()
 
+
 def get_pad_xrange():
-    return (ROOT.gPad.GetUxmax() - ROOT.gPad.GetUxmin())
+    return ROOT.gPad.GetUxmax() - ROOT.gPad.GetUxmin()
+
 
 def get_pad_yrange():
-    return (ROOT.gPad.GetUymax() - ROOT.gPad.GetUymin())
+    return ROOT.gPad.GetUymax() - ROOT.gPad.GetUymin()
+
 
 def get_pad_xyratio():
-    return (ROOT.gPad.GetUxmax() - ROOT.gPad.GetUxmin()) / (ROOT.gPad.GetUymax() - ROOT.gPad.GetUymin())
+    return (ROOT.gPad.GetUxmax() - ROOT.gPad.GetUxmin()) / (
+        ROOT.gPad.GetUymax() - ROOT.gPad.GetUymin()
+    )
 
-def get_label_anchor_left(x = 0.03):
+
+def get_label_anchor_left(x=0.03):
     return x * get_pad_xrange() + get_pad_xmin()
 
-def get_label_anchor_right(x = 0.03):
+
+def get_label_anchor_right(x=0.03):
     return (1.0 - x) * get_pad_xrange() + get_pad_xmin()
 
-def get_label_anchor_top(y = 0.03):
+
+def get_label_anchor_top(y=0.03):
     return (1.0 - y) * get_pad_yrange() + get_pad_ymin()
 
-def get_label_anchor_bottom(y = 0.03):
+
+def get_label_anchor_bottom(y=0.03):
     return y * get_pad_yrange() + get_pad_ymin()
 
-def draw_label_top_left(label, size_pixels = 3, text_align = ROOT.kVAlignTop + ROOT.kHAlignLeft, color=ROOT.kBlack, margin_NDC = 0.03):
+
+def draw_label_top_left(
+    label: str,
+    scaling: Literal["ndc", "pixels"] = "ndc",
+    size: Union[int, float] = None,
+    text_align: int = ROOT.kVAlignTop + ROOT.kHAlignLeft,
+    color: int = ROOT.kBlack,
+    margin_NDC: float = 0.03,
+) -> ROOT.TLatex:
+    """
+    Draw a text label in the top-left corner of the current ROOT pad.
+
+    :param label: The label to draw.
+    :type label: str
+
+    :param scaling: The type of scaling to use. By default, use NDC scaling. Otherwise, use traditional pixel scaling.
+    :type scaling: Literal["ndc", "user"]
+
+    :param size: The size in pixels if using 'pixels' scaling or as a fraction of the pad height if using 'ndc' scaling. If empty, use the default values.
+    :type size: int or float, optional
+
+    :param text_align: The ROOT.TAttText text alignment specifier.
+    :type text_align: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param margin_NDC: The fraction of the plot window to use as a margin.
+    :type margin_NDC: float
+
+    :returns: the ROOT.TLatex object generating the label.
+    :rtype: ROOT.TLatex
+    :raises ValueError: if the scaling is not 'ndc' or 'pixels'
+    """
     ltx = ROOT.TLatex()
-    ltx.SetTextSizePixels(size_pixels)
+    if scaling == "ndc":
+        if size is not None:
+            ltx.SetTextSize(size)
+    elif scaling == "pixels":
+        ltx.SetTextFont(63)
+        if size is not None:
+            ltx.SetTextSizePixels(size)
+    else:
+        raise ValueError("Scaling must be 'ndc' or 'pixels' only.")
     ltx.SetTextAlign(text_align)
     ltx.SetTextColor(color)
-    ltx.DrawLatex(get_label_anchor_left(margin_NDC), get_label_anchor_top(margin_NDC), label)
+    ltx.DrawLatex(
+        get_label_anchor_left(margin_NDC), get_label_anchor_top(margin_NDC), label
+    )
     return ltx
 
-def draw_label_top_right(label, size_pixels = 3, text_align = ROOT.kVAlignTop + ROOT.kHAlignRight, color=ROOT.kBlack, margin_NDC = 0.03):
+
+def draw_label_top_right(
+    label: str,
+    scaling: Literal["ndc", "pixels"] = "ndc",
+    size: Union[int, float] = None,
+    text_align: int = ROOT.kVAlignTop + ROOT.kHAlignRight,
+    color: int = ROOT.kBlack,
+    margin_NDC: float = 0.03,
+) -> ROOT.TLatex:
+    """
+    Draw a text label in the top-right corner of the current ROOT pad.
+
+    :param label: The label to draw.
+    :type label: str
+
+    :param scaling: The type of scaling to use. By default, use NDC scaling. Otherwise, use traditional pixel scaling.
+    :type scaling: Literal["ndc", "user"]
+
+    :param size: The size in pixels if using 'pixels' scaling or as a fraction of the pad height if using 'ndc' scaling. If empty, use the default values.
+    :type size: int or float, optional
+
+    :param text_align: The ROOT.TAttText text alignment specifier.
+    :type text_align: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param margin_NDC: The fraction of the plot window to use as a margin.
+    :type margin_NDC: float
+
+    :returns: the ROOT.TLatex object generating the label.
+    :rtype: ROOT.TLatex
+    :raises ValueError: if the scaling is not 'ndc' or 'pixels'
+    """
     ltx = ROOT.TLatex()
-    ltx.SetTextSizePixels(size_pixels)
+    if scaling == "ndc":
+        if size is not None:
+            ltx.SetTextSize(size)
+    elif scaling == "pixels":
+        ltx.SetTextFont(63)
+        if size is not None:
+            ltx.SetTextSizePixels(size)
+    else:
+        raise ValueError("Scaling must be 'ndc' or 'pixels' only.")
     ltx.SetTextAlign(text_align)
     ltx.SetTextColor(color)
-    ltx.DrawLatex(get_label_anchor_right(margin_NDC), get_label_anchor_top(margin_NDC), label)
+    ltx.DrawLatex(
+        get_label_anchor_right(margin_NDC), get_label_anchor_top(margin_NDC), label
+    )
     return ltx
 
-def draw_label_bottom_left(label, size_pixels = 3, text_align = ROOT.kVAlignBottom + ROOT.kHAlignLeft, color=ROOT.kBlack, margin_NDC = 0.03):
+
+def draw_label_bottom_left(
+    label: str,
+    scaling: Literal["ndc", "pixels"] = "ndc",
+    size: Union[int, float] = None,
+    text_align: int = ROOT.kVAlignBottom + ROOT.kHAlignLeft,
+    color: int = ROOT.kBlack,
+    margin_NDC: float = 0.03,
+) -> ROOT.TLatex:
+    """
+    Draw a text label in the bottom-left corner of the current ROOT pad.
+
+    :param label: The label to draw.
+    :type label: str
+
+    :param scaling: The type of scaling to use. By default, use NDC scaling. Otherwise, use traditional pixel scaling.
+    :type scaling: Literal["ndc", "user"]
+
+    :param size: The size in pixels if using 'pixels' scaling or as a fraction of the pad height if using 'ndc' scaling. If empty, use the default values.
+    :type size: int or float, optional
+
+    :param text_align: The ROOT.TAttText text alignment specifier.
+    :type text_align: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param margin_NDC: The fraction of the plot window to use as a margin.
+    :type margin_NDC: float
+
+    :returns: the ROOT.TLatex object generating the label.
+    :rtype: ROOT.TLatex
+    :raises ValueError: if the scaling is not 'ndc' or 'pixels'
+    """
     ltx = ROOT.TLatex()
-    ltx.SetTextSizePixels(size_pixels)
+    if scaling == "ndc":
+        if size is not None:
+            ltx.SetTextSize(size)
+    elif scaling == "pixels":
+        ltx.SetTextFont(63)
+        if size is not None:
+            ltx.SetTextSizePixels(size)
+    else:
+        raise ValueError("Scaling must be 'ndc' or 'pixels' only.")
     ltx.SetTextAlign(text_align)
     ltx.SetTextColor(color)
-    ltx.DrawLatex(get_label_anchor_left(margin_NDC), get_label_anchor_bottom(margin_NDC), label)
+    ltx.DrawLatex(
+        get_label_anchor_left(margin_NDC), get_label_anchor_bottom(margin_NDC), label
+    )
     return ltx
 
-def draw_label_bottom_right(label, size_pixels = 3, text_align = ROOT.kVAlignBottom + ROOT.kHAlignRight, color=ROOT.kBlack, margin_NDC = 0.03):
+
+def draw_label_bottom_right(
+    label: str,
+    scaling: Literal["ndc", "pixels"] = "ndc",
+    size: Union[int, float] = None,
+    text_align: int = ROOT.kVAlignBottom + ROOT.kHAlignRight,
+    color: int = ROOT.kBlack,
+    margin_NDC: float = 0.03,
+) -> ROOT.TLatex:
+    """
+    Draw a text label in the bottom-right corner of the current ROOT pad.
+
+    :param label: The label to draw.
+    :type label: str
+
+    :param scaling: The type of scaling to use. By default, use NDC scaling. Otherwise, use traditional pixel scaling.
+    :type scaling: Literal["ndc", "user"]
+
+    :param size: The size in pixels if using 'pixels' scaling or as a fraction of the pad height if using 'ndc' scaling. If empty, use the default values.
+    :type size: int or float, optional
+
+    :param text_align: The ROOT.TAttText text alignment specifier.
+    :type text_align: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param margin_NDC: The fraction of the plot window to use as a margin.
+    :type margin_NDC: float
+
+    :returns: the ROOT.TLatex object generating the label.
+    :rtype: ROOT.TLatex
+    :raises ValueError: if the scaling is not 'ndc' or 'pixels'
+    """
     ltx = ROOT.TLatex()
-    ltx.SetTextSizePixels(size_pixels)
+    if scaling == "ndc":
+        if size is not None:
+            ltx.SetTextSize(size)
+    elif scaling == "pixels":
+        ltx.SetTextFont(63)
+        if size is not None:
+            ltx.SetTextSizePixels(size)
+    else:
+        raise ValueError("Scaling must be 'ndc' or 'pixels' only.")
     ltx.SetTextAlign(text_align)
     ltx.SetTextColor(color)
-    ltx.DrawLatex(get_label_anchor_right(margin_NDC), get_label_anchor_bottom(margin_NDC), label)
+    ltx.DrawLatex(
+        get_label_anchor_right(margin_NDC), get_label_anchor_bottom(margin_NDC), label
+    )
     return ltx
 
 
