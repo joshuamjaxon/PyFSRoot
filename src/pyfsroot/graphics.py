@@ -600,6 +600,92 @@ def draw_label_bottom_right(
     return ltx
 
 
+def draw_label_at_fraction(
+    label: str,
+    font: int = 6,
+    scaling: Literal["ndc", "pixels"] = "ndc",
+    size: Union[int, float] = None,
+    text_align: int = "top right",
+    color: int = ROOT.kBlack,
+    x: float = 0.95,
+    y: float = 0.95,
+) -> ROOT.TLatex:
+    """
+    Draw a text label at the given position relative to the size of the plot content. Accounts for log scaling.
+
+    :param label: The label to draw.
+    :type label: str
+
+    :param font: The font to use. ROOT enables fonts [1, 14].
+    :type label: int
+
+    :param scaling: The type of scaling to use. By default, use NDC scaling. Otherwise, use traditional pixel scaling.
+    :type scaling: Literal["ndc", "pixels"]
+
+    :param size: The size in pixels if using 'pixels' scaling or as a fraction of the pad height if using 'ndc' scaling. If empty, use the default values.
+    :type size: int or float, optional
+
+    :param text_align: The ROOT.TAttText text alignment specifier.
+    :type text_align: int
+
+    :param color: The ROOT.TColor expressed as an integer.
+    :type color: int
+
+    :param x: Where to plot the label anchor horizontally, as a fraction of the plot content.
+    :type x: float
+
+    :param y: Where to plot the label anchor vertically, as a fraction of the plot content.
+    :type y: float
+
+    :returns: the ROOT.TLatex object generating the label.
+    :rtype: ROOT.TLatex
+    :raises ValueError: if the scaling is not 'ndc' or 'pixels'
+    """
+    # Set up a TLatex
+    ltx = ROOT.TLatex()
+    # Set the font, precision, and size
+    if font < 1 or font > 14:
+        raise ValueError("Font must be an integer between 1 and 14, inclusive.")
+    if scaling == "ndc":
+        ltx.SetTextFont(font*10 + 2)
+        if size is not None:
+            ltx.SetTextSize(size)
+    elif scaling == "pixels":
+        ltx.SetTextFont(font*10 + 3)
+        if size is not None:
+            ltx.SetTextSizePixels(size)
+    else:
+        raise ValueError("Scaling must be 'ndc' or 'pixels' only.")
+    # Set the alignment using strings or integers
+    if type(text_align) == int:
+        ltx.SetTextAlign(text_align)
+    elif type(text_align) == str:
+        lc_text_align = text_align.lower()
+        if   lc_text_align == "top right" or lc_text_align == "right top":
+            ltx.SetTextAlign(ROOT.kVAlignTop + ROOT.kHAlignRight)
+        elif lc_text_align == "top left" or lc_text_align == "left top":
+            ltx.SetTextAlign(ROOT.kVAlignTop + ROOT.kHAlignLeft)
+        elif lc_text_align == "bottom right" or lc_text_align == "right bottom":
+            ltx.SetTextAlign(ROOT.kVAlignBottom + ROOT.kHAlignRight)
+        elif lc_text_align == "bottom left" or lc_text_align == "left bottom":
+            ltx.SetTextAlign(ROOT.kVAlignBottom + ROOT.kHAlignLeft)
+        else:
+            raise ValueError("When passing strings as text alignment, must use 'top/bottom left/right'.")
+    else:
+        raise ValueError("Text alignment must be an integer or a string!")
+    # Set the color
+    ltx.SetTextColor(color)
+    # Figure out where to draw it, assuming the current pad
+    left_margin   = ROOT.gPad.GetLeftMargin()
+    right_margin  = ROOT.gPad.GetRightMargin()
+    top_margin    = ROOT.gPad.GetTopMargin()
+    bottom_margin = ROOT.gPad.GetBottomMargin()
+    x_NDC = left_margin   + x * (1.0 - left_margin - right_margin)
+    y_NDC = bottom_margin + y * (1.0 - bottom_margin - top_margin)
+    ltx.DrawLatexNDC(x_NDC, y_NDC, label)
+    return ltx
+
+
 def make_multi_pad_canvas(
     rows=1,
     columns=1,
