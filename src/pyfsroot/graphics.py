@@ -694,6 +694,7 @@ def make_multi_pad_canvas(
     info_height=100,
     name="",
     title="Canvas",
+    extras=0,
 ):
     """
     Make a grid of identical canvases with room on the bottom for an info
@@ -701,6 +702,13 @@ def make_multi_pad_canvas(
     because ideally you want all the plots--not pads--to be the same size,
     accounting for margins.
     """
+
+    if extras >= columns:
+        raise ValueError("Extras must be less than the number of columns!")
+    enable_extras_panel = True
+    if extras < 0:
+        extras = -extras
+        enable_extras_panel = False
 
     f_normal_height = (
         int(ROOT.gStyle.GetCanvasDefH()) if normal_height is None else normal_height
@@ -710,10 +718,15 @@ def make_multi_pad_canvas(
     )
     f_info_height = int(info_height)
 
-    pad_top_margin = int(ROOT.gStyle.GetPadTopMargin() * f_normal_height)
-    pad_bottom_margin = int(ROOT.gStyle.GetPadBottomMargin() * f_normal_height)
-    pad_left_margin = int(ROOT.gStyle.GetPadLeftMargin() * f_normal_width)
-    pad_right_margin = int(ROOT.gStyle.GetPadRightMargin() * f_normal_width)
+    pad_top_margin_NDC    = ROOT.gStyle.GetPadTopMargin()
+    pad_bottom_margin_NDC = ROOT.gStyle.GetPadBottomMargin()
+    pad_left_margin_NDC   = ROOT.gStyle.GetPadLeftMargin()
+    pad_right_margin_NDC  = ROOT.gStyle.GetPadRightMargin()
+
+    pad_top_margin    = int(pad_top_margin_NDC    * f_normal_height)
+    pad_bottom_margin = int(pad_bottom_margin_NDC * f_normal_height)
+    pad_left_margin   = int(pad_left_margin_NDC   * f_normal_width)
+    pad_right_margin  = int(pad_right_margin_NDC  * f_normal_width)
 
     plot_height = f_normal_height - pad_top_margin - pad_bottom_margin
     plot_width = f_normal_width - pad_left_margin - pad_right_margin
@@ -735,6 +748,10 @@ def make_multi_pad_canvas(
     current_top_left_x = 0
     current_top_left_y = 1.0
 
+    clamp = lambda x: max(0.0, min(x, 1.0))
+
+    escape_loop = False
+
     for ri in range(rows):
 
         for ci in range(columns):
@@ -755,19 +772,31 @@ def make_multi_pad_canvas(
             current_pad_height_ndc = current_pad_height / canvas_height
             current_pad_width_ndc = current_pad_width / canvas_width
 
+            extra_top_buffer = 0
+            extra_bottom_buffer = 0
+            if extras and ri == rows - 2 and ci >= columns - extras: 
+                extra_bottom_buffer = pad_bottom_margin
+            if extras and ri == rows - 1 and ci >= columns - extras: 
+                extra_top_buffer = pad_bottom_margin
+                # Break here because no more plots need to be drawn
+                # We'll draw one more special panel, the "extras" panel
+                # that contains the remaining space after the loop
+                escape_loop = True
+                continue
+
             ipad = ROOT.TPad(
                 pad_name,
                 pad_name,
-                current_top_left_x,
-                current_top_left_y - current_pad_height_ndc,
-                current_top_left_x + current_pad_width_ndc,
-                current_top_left_y,
+                clamp(current_top_left_x),
+                clamp(current_top_left_y - current_pad_height_ndc - extra_bottom_buffer / canvas_height),
+                clamp(current_top_left_x + current_pad_width_ndc),
+                clamp(current_top_left_y),
             )
 
             ipad.SetNumber(pad_number)
 
             ipad.SetTopMargin(current_top_margin / current_pad_height)
-            ipad.SetBottomMargin(current_bottom_margin / current_pad_height)
+            ipad.SetBottomMargin((current_bottom_margin + extra_bottom_buffer) / (current_pad_height + extra_bottom_buffer))
             ipad.SetLeftMargin(current_left_margin / current_pad_width)
             ipad.SetRightMargin(current_right_margin / current_pad_width)
 
@@ -777,11 +806,40 @@ def make_multi_pad_canvas(
 
             current_top_left_x += current_pad_width_ndc
 
+        if escape_loop: break
+
         current_top_left_x = 0.0
         current_top_left_y -= current_pad_height_ndc
 
     canvas._grid_pads = grid_pads
 
+    # If there is extra space, make an "extras panel"
+    # This panel is just meant for things like text and legends
+    # It will have zero margins and a weird shape so it is
+    # not suitable for plotting
+    extras_pad = None
+    if extras and enable_extras_panel:
+        extras_pad_name = f"canvas_{name}_extras_pad"
+        extras_pad = ROOT.TPad(
+            extras_pad_name,
+            extras_pad_name,
+            # Use the left/bottom margins for both sides
+            # # It just looks better generally 
+            clamp(current_top_left_x + pad_left_margin / canvas_width),    # LEFT
+            clamp(pad_bottom_margin / canvas_height),                      # BOTTOM
+            clamp((canvas_width - pad_left_margin) / canvas_width),        # RIGHT
+            clamp(current_top_left_y - pad_bottom_margin / canvas_height), # TOP
+        )
+        extras_pad.SetTopMargin(0.0)
+        extras_pad.SetBottomMargin(0.0)
+        extras_pad.SetLeftMargin(0.0)
+        extras_pad.SetRightMargin(0.0)
+        extras_pad.Draw()
+    canvas._extras_pad = extras_pad
+
+
+    # And lastly make the info panel
+    info_pad = None
     if info_height:
         info_pad_name = f"canvas_{name}_info_pad"
         info_pad = ROOT.TPad(
@@ -794,6 +852,6 @@ def make_multi_pad_canvas(
         )
         info_pad.SetNumber(rows * columns + 1)
         info_pad.Draw()
-        canvas._info_pad = info_pad
+    canvas._info_pad = info_pad
     
     return canvas
