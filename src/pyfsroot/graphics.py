@@ -826,7 +826,9 @@ def make_multi_pad_canvas(
             # Use the left/bottom margins for both sides
             # # It just looks better generally 
             clamp(current_top_left_x + pad_left_margin / canvas_width),    # LEFT
-            clamp(pad_bottom_margin / canvas_height),                      # BOTTOM
+            #clamp(pad_bottom_margin / canvas_height),                      # BOTTOM
+            #clamp(((info_pad_top_right_y * canvas_height) + pad_bottom_margin )/ canvas_height),                                   # BOTTOM
+            clamp(info_pad_top_right_y + pad_bottom_margin / canvas_height),                                   # BOTTOM
             clamp((canvas_width - pad_left_margin) / canvas_width),        # RIGHT
             clamp(current_top_left_y - pad_bottom_margin / canvas_height), # TOP
         )
